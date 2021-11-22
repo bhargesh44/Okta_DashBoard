@@ -1,0 +1,20 @@
+@import "../node_modules/@syncfusion/ej2-react-buttons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-base/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-buttons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-calendars/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-dropdowns/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-inputs/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-navigations/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-popups/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-react-grids/styles/material.css";
+
+/* .e-grid .e-altrow {
+  background-color: #f5f5f5;
+} */
+.e-grid .e-row {
+  background-color: "#FAFAFA";
+}
+.e-grid .e-altrow {
+  background-color: "#f5f5f5";
+}

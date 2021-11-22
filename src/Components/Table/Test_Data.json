@@ -1,0 +1,167 @@
+[
+    {
+        "id": "00u29nafmnCRSpFTw5d7a",
+        "status": "STAGED",
+        "profile": {
+            "displayName": "Aimee D",
+            "email": "aimee.D@ikam.ai",
+            "secondEmail": "aimeecD@someplacefaraway.com",
+            "employmentStatus": "Full-Time",
+            "title": "Global Vice President, KOL Strategy",
+            "workLocation": "Remote, NY",
+            "countryCode": "US",
+            "department": "Marketing: Marketing",
+            "hireDate": "2021-10-25"
+        }
+    },
+    {
+        "id": "00u29nafmrJkWkFlH5d7b",
+        "status": "STAGED",
+        "profile": {
+            "displayName": "Haley f",
+            "email": "haley.f@ikam.ai",
+            "secondEmail": "h.f@someplacefaraway.com",
+            "employmentStatus": "Full-Time",
+            "title": "Customer Success Manager - Southeast",
+            "workLocation": "Remote, FL",
+            "countryCode": "US",
+            "department": "Customer Success",
+            "hireDate": "2021-10-25"
+        }
+    },
+    {
+        "id": "00u29nafmvztwuZen5d7v",
+        "status": "STAGED",
+        "profile": {
+            "displayName": "Andrew m",
+            "email": "andrew.m@ikam.ai",
+            "secondEmail": "andrew.m.234342a@someplacefaraway.com",
+            "employmentStatus": "Full-Time",
+            "title": "Website Designer",
+            "workLocation": "Remote, VA",
+            "countryCode": "US",
+            "department": "Marketing: Demand Generation",
+            "hireDate": "2021-10-25"
+        }
+    },
+    {
+        "id": "00u29nafn5flTKHjj5d7l",
+        "status": "Active",
+        "profile": {
+            "displayName": "Tommy v",
+            "email": "tommy.t@ikam.ai",
+            "secondEmail": "tommy432@someplacefaraway.com",
+            "employmentStatus": "Full-Time",
+            "title": "Senior UI/UX Designer",
+            "workLocation": "Tel-Aviv-Yafo, Israel",
+            "countryCode": "IL",
+            "department": "UI/UX",
+            "hireDate": "2021-10-25"
+        }
+    },
+    {
+        "id": "00u29nafmys5B1xxG5d7f",
+        "status": "STAGED",
+        "profile": {
+            "displayName": "Ashley s",
+            "email": "ashley.s@ikam.ai",
+            "secondEmail": "ash23ley24@someplacefaraway.com",
+            "employmentStatus": "Consultant",
+            "title": "Consultant",
+            "workLocation": "Remote, NC",
+            "countryCode": "US",
+            "department": "Talent Acquisition",
+            "hireDate": "2021-10-25"
+        }
+    },
+    {
+        "id": "00u29nafn5flTKHjj5d7g",
+        "status": "STAGED",
+        "profile": {
+            "displayName": "Jenny v",
+            "email": "jenny.v@ikam.ai",
+            "secondEmail": "jenny432@someplacefaraway.com",
+            "employmentStatus": "Full-Time",
+            "title": "Senior UI/UX Designer",
+            "workLocation": "Tel-Aviv-Yafo, Israel",
+            "countryCode": "IL",
+            "department": "UI/UX",
+            "hireDate": "2021-10-25"
+        }
+    },
+    {
+        "id": "00u29nafn5flTKHjj5d7j",
+        "status": "Active",
+        "profile": {
+            "displayName": "Bhargesh G",
+            "email": "bhargesh@gmail.com",
+            "secondEmail": "bhargesh@bhargesh.com",
+            "employmentStatus": "Full-Time",
+            "title": "Senior UI/UX Designer",
+            "workLocation": "Amreli, India",
+            "countryCode": "IL",
+            "department": "UI/UX",
+            "hireDate": "2021-10-22"
+        }
+    },
+    {
+        "id": "00u29nafn5flTKHjj5d7y",
+        "status": "Pending User Action",
+        "profile": {
+            "displayName": "Jalpesh G",
+            "email": "jalpesh@gmail.com",
+            "secondEmail": "jalpesh@jalpesh.com",
+            "employmentStatus": "Full-Time",
+            "title": "Senior UI/UX Designer",
+            "workLocation": "Surat, India",
+            "countryCode": "IL",
+            "department": "Designer",
+            "hireDate": "2021-10-20"
+        }
+    },
+    {
+        "id": "00u29nafn5flTKHjj5d7z",
+        "status": "STAGED",
+        "profile": {
+            "displayName": "Nitesh G",
+            "email": "nitesh@gmail.com",
+            "secondEmail": "nitesh@nitesh.com",
+            "employmentStatus": "Full-Time",
+            "title": "Senior UI/UX Designer",
+            "workLocation": "Surat, India",
+            "countryCode": "IL",
+            "department": "Artist",
+            "hireDate": "2021-10-20"
+        }
+    },
+    {
+        "id": "00u29nafn5flTKHjj5d7t",
+        "status": "STAGED",
+        "profile": {
+            "displayName": "Yash G",
+            "email": "yash@gmail.com",
+            "secondEmail": "yash@yash.com",
+            "employmentStatus": "Full-Time",
+            "title": "Senior UI/UX Designer",
+            "workLocation": "London",
+            "countryCode": "IL",
+            "department": "Designer",
+            "hireDate": "2021-10-28"
+        }
+    },
+    {
+        "id": "00u29nafn5flTKHjj5d7o",
+        "status": "Pending User Action",
+        "profile": {
+            "displayName": "Jack G",
+            "email": "Jack@gmail.com",
+            "secondEmail": "Jack@Jack.com",
+            "employmentStatus": "Full-Time",
+            "title": "Senior UI/UX Designer",
+            "workLocation": "NewYork",
+            "countryCode": "IL",
+            "department": "Designer",
+            "hireDate": "2021-10-28"
+        }
+    }
+]
