@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import Test_Data from "../../../Components/Table/Test_Data.json";
+import React, { useEffect, useState } from "react";
 import "../../../Components/Table/table.css";
 import {
   Alert,
@@ -27,7 +26,7 @@ import moment from "moment";
 function List() {
   const { oktaAuth, authState } = useOktaAuth();
 
-  const [data, setData] = useState(Test_Data);
+  const [data, setData] = useState<any>([]);
 
   const [startDate, setStartDate] = useState<any>(
     moment(new Date()).format("YYYY-MM-DD")
@@ -44,30 +43,36 @@ function List() {
 
   const [order, setOrder] = useState("ASC");
 
-  // const accessToken = authState?.accessToken;
-  // //  global fetch
-  // const response = fetch("https://dev-52092247.okta.com/api/v1/users", {
+  // with node back-end
+  // const response = fetch("http://localhost:3050/alluser/", {
   //   method: "GET",
-  //   mode: "no-cors",
-  //   headers: {
-  //     Authorization: `Bearer ${accessToken}`,
-  //   },
-  // }).then((res) => {
-  //   console.log("Okta Response :", res);
-  // });
+  // })
+  //   .then((res) => res.json())
+  //   .then((jsonData) => console.log(jsonData));
+
+  //const accessToken = authState?.accessToken;
+
+  const token = "00Juo-rB3CDkSuqsU2ATcfuJSCtzcJ8q86MkXeeeT3";
+  useEffect(() => {
+    fetch("https://dev-52092247.okta.com/api/v1/users/", {
+      method: "GET",
+      headers: {
+        Authorization: `SSWS ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((jsonData) => setData(jsonData));
+  }, []);
 
   const sortByStatus = (colName, forProfile) => {
     if (order === "ASC") {
       if (forProfile) {
         var sorted = [...data].sort((a, b) =>
-          a["profile"][colName].toLowerCase() >
-          b["profile"][colName].toLowerCase()
-            ? 1
-            : -1
+          a["profile"][colName] > b["profile"][colName] ? 1 : -1
         );
       } else {
         var sorted = [...data].sort((a, b) =>
-          a[colName].toLowerCase() > b[colName].toLowerCase() ? 1 : -1
+          a[colName] > b[colName] ? 1 : -1
         );
       }
 
@@ -77,14 +82,11 @@ function List() {
     if (order === "DSC") {
       if (forProfile) {
         var sorted = [...data].sort((a, b) =>
-          a["profile"][colName].toLowerCase() <
-          b["profile"][colName].toLowerCase()
-            ? 1
-            : -1
+          a["profile"][colName] < b["profile"][colName] ? 1 : -1
         );
       } else {
         var sorted = [...data].sort((a, b) =>
-          a[colName].toLowerCase() < b[colName].toLowerCase() ? 1 : -1
+          a[colName] < b[colName] ? 1 : -1
         );
       }
       setData(sorted);
@@ -108,10 +110,26 @@ function List() {
     }
   };
 
-  const changeAccountStatus = () => {
+  const activeAccount = async (): Promise<any> => {
+    await fetch(
+      `https://dev-52092247.okta.com/api/v1/users/00u2fq8fuesvdxNAv5d7/lifecycle/activate?sendEmail=true`,
+      {
+        method: "GET",
+        mode: "no-cors",
+        headers: {
+          ContentType: "application/json",
+          Accept: "application/json",
+          Authorization: `SSWS ${token}`,
+        },
+      }
+    );
+  };
+
+  const changeAccountStatus = async () => {
     if (selectedUser.status !== "STAGED") {
       setShowAlert(true);
     } else {
+      //await activeAccount().then((res) => res.json());
       setShowStatusModal({ ...showStatusModal, isSuccess: true });
     }
   };
@@ -136,13 +154,12 @@ function List() {
         justifyContent="end"
         mb={2}
       >
-        <Button
-          variant="contained"
-          color="inherit"
-          onClick={logout}
-          title="Logout"
-        >
+        <Button variant="contained" color="inherit" onClick={logout}>
           Logout
+        </Button>
+
+        <Button variant="contained" color="inherit" onClick={activeAccount}>
+          Check
         </Button>
       </Grid>
 
@@ -166,7 +183,6 @@ function List() {
                 variant="contained"
                 onClick={changeAccountStatus}
                 disabled={!selectedUser}
-                title="Active Account"
               >
                 Active Account
               </Button>
@@ -227,15 +243,16 @@ function List() {
             </TableHead>
             <TableBody>
               {data
-                .filter((user) => {
+                ?.filter((user) => {
                   // start date filter
                   if (startDate === null) {
                     return user;
                   } else if (user.profile.hireDate.includes(startDate)) {
                     return user;
                   }
+                  return false;
                 })
-                .map((user, id) => (
+                ?.map((user, id) => (
                   <TableRow
                     id={user.id}
                     style={
