@@ -43,12 +43,14 @@ function List() {
 
   const [order, setOrder] = useState("ASC");
 
-  // with node back-end
-  // const response = fetch("http://localhost:3050/alluser/", {
-  //   method: "GET",
-  // })
-  //   .then((res) => res.json())
-  //   .then((jsonData) => console.log(jsonData));
+  //with node back-end
+  // useEffect(() => {
+  //   fetch("http://localhost:3050/alluser/", {
+  //     method: "GET",
+  //   })
+  //     .then((res) => res.json())
+  //     .then((jsonData) => setData(jsonData));
+  // }, []);
 
   //const accessToken = authState?.accessToken;
 
@@ -110,27 +112,32 @@ function List() {
     }
   };
 
-  const activeAccount = async (): Promise<any> => {
-    await fetch(
-      `https://dev-52092247.okta.com/api/v1/users/00u2fq8fuesvdxNAv5d7/lifecycle/activate?sendEmail=true`,
+  const activeAccount = () => {
+    fetch(
+      `https://dev-52092247.okta.com/api/v1/users/${selectedUser.id}/lifecycle/activate?sendEmail=true`,
       {
-        method: "GET",
-        mode: "no-cors",
+        method: "POST",
         headers: {
           ContentType: "application/json",
           Accept: "application/json",
           Authorization: `SSWS ${token}`,
         },
       }
-    );
+    ).then((res) => {
+      console.log("res", res.json());
+      if (res.status >= 200 && res.status <= 299) {
+        setShowStatusModal({ ...showStatusModal, isSuccess: true });
+      } else {
+        setShowStatusModal({ ...showStatusModal, isFailure: true });
+      }
+    });
   };
 
-  const changeAccountStatus = async () => {
-    if (selectedUser.status !== "STAGED") {
+  const changeAccountStatus = () => {
+    if (selectedUser.status !== ("STAGED" && "ACTIVE")) {
       setShowAlert(true);
     } else {
-      //await activeAccount().then((res) => res.json());
-      setShowStatusModal({ ...showStatusModal, isSuccess: true });
+      activeAccount();
     }
   };
 
@@ -156,10 +163,6 @@ function List() {
       >
         <Button variant="contained" color="inherit" onClick={logout}>
           Logout
-        </Button>
-
-        <Button variant="contained" color="inherit" onClick={activeAccount}>
-          Check
         </Button>
       </Grid>
 
