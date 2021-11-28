@@ -28,21 +28,17 @@ const FailureDialog = (props) => {
   const classes = useStyles();
 
   const handleClose = () => {
+    props.setShowStatusModal({ ...props.showStatusModal, isFailure: false });
     setOpen(false);
   };
 
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle style={{ border: "2px solid black" }}>
-          <Typography variant="h4">Failure</Typography>
-        </DialogTitle>
+        <DialogTitle style={{ border: "2px solid black" }}>Failure</DialogTitle>
         <DialogContent style={{ border: "2px solid black" }}>
           <DialogContentText className={classes.failure}>
-            <Typography variant="h6">
-              {props.user.profile.displayName.split(" ")[0]}'s Account is
-              Already Activated
-            </Typography>
+            {props.user.profile.displayName}'s Account is Already Activated
             <Button
               onClick={handleClose}
               variant="contained"

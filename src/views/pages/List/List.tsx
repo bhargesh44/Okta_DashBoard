@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../../../Components/Table/table.css";
 import {
   Alert,
+  Box,
   Button,
   Grid,
   Table,
@@ -12,6 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { makeStyles } from "@material-ui/core";
 import SuccessDialog from "../DialogBox/SuccessDialog";
 import CachedIcon from "@mui/icons-material/Cached";
 import FailureDialog from "../DialogBox/FailureDialog";
@@ -23,8 +25,22 @@ import { useOktaAuth } from "@okta/okta-react";
 
 import moment from "moment";
 
+const useStyles = makeStyles({
+  active: {
+    color: "white",
+  },
+  deactive: {
+    color: "black",
+  },
+  tableBody: {
+    overflowY: "scroll",
+  },
+});
+
 function List() {
   const { oktaAuth, authState } = useOktaAuth();
+
+  const classes = useStyles();
 
   const [data, setData] = useState<any>([]);
 
@@ -39,32 +55,24 @@ function List() {
     isFailure: false,
   });
 
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-
   const [order, setOrder] = useState("ASC");
+  const token = process.env.REACT_APP_OKTA_TOKEN;
 
-  //with node back-end
-  // useEffect(() => {
-  //   fetch("http://localhost:3050/alluser/", {
-  //     method: "GET",
-  //   })
-  //     .then((res) => res.json())
-  //     .then((jsonData) => setData(jsonData));
-  // }, []);
-
-  //const accessToken = authState?.accessToken;
-
-  const token = "00Juo-rB3CDkSuqsU2ATcfuJSCtzcJ8q86MkXeeeT3";
-  useEffect(() => {
-    fetch("https://dev-52092247.okta.com/api/v1/users/", {
-      method: "GET",
-      headers: {
-        Authorization: `SSWS ${token}`,
-      },
-    })
+  const getUserByHireDate = (hireDate) => {
+    fetch(
+      `${process.env.REACT_APP_BASE_URL}/api/v1/users/?search=profile.hireDate Eq "${hireDate}"`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `SSWS ${token}`,
+        },
+      }
+    )
       .then((res) => res.json())
       .then((jsonData) => setData(jsonData));
-  }, []);
+  };
+
+  useEffect(() => getUserByHireDate(startDate), []);
 
   const sortByStatus = (colName, forProfile) => {
     if (order === "ASC") {
@@ -101,10 +109,6 @@ function List() {
   const logout = async () => oktaAuth.signOut();
 
   const toggleActive = (user) => {
-    setShowAlert(false);
-
-    setShowStatusModal({ ...showStatusModal, isSuccess: false });
-
     if (selectedUser?.id === user.id) {
       setSelectedUser(null);
     } else {
@@ -114,7 +118,7 @@ function List() {
 
   const activeAccount = () => {
     fetch(
-      `https://dev-52092247.okta.com/api/v1/users/${selectedUser.id}/lifecycle/activate?sendEmail=true`,
+      `${process.env.REACT_APP_BASE_URL}/api/v1/users/${selectedUser.id}/lifecycle/activate?sendEmail=true`,
       {
         method: "POST",
         headers: {
@@ -123,34 +127,43 @@ function List() {
           Authorization: `SSWS ${token}`,
         },
       }
-    ).then((res) => {
-      console.log("res", res.json());
-      if (res.status >= 200 && res.status <= 299) {
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error("Something went wrong!");
+        }
+      })
+      .then((responseJson) => {
         setShowStatusModal({ ...showStatusModal, isSuccess: true });
-      } else {
+      })
+      .catch((error) => {
         setShowStatusModal({ ...showStatusModal, isFailure: true });
-      }
-    });
+      });
   };
 
   const changeAccountStatus = () => {
-    if (selectedUser.status !== ("STAGED" && "ACTIVE")) {
-      setShowAlert(true);
-    } else {
-      activeAccount();
-    }
+    activeAccount();
   };
 
   return (
     <>
       {selectedUser && showStatusModal.isSuccess && (
-        <SuccessDialog user={selectedUser} />
+        <SuccessDialog
+          user={selectedUser}
+          getUserByHireDate={getUserByHireDate}
+          startDate={startDate}
+          setShowStatusModal={setShowStatusModal}
+          showStatusModal={showStatusModal}
+        />
       )}
       {selectedUser && showStatusModal.isFailure && (
-        <FailureDialog user={selectedUser} />
-      )}
-      {showAlert && (
-        <Alert severity="warning">Account can not be activated</Alert>
+        <FailureDialog
+          user={selectedUser}
+          setShowStatusModal={setShowStatusModal}
+          showStatusModal={showStatusModal}
+        />
       )}
       <Grid
         container
@@ -161,22 +174,22 @@ function List() {
         justifyContent="end"
         mb={2}
       >
-        <Button variant="contained" color="inherit" onClick={logout}>
+        <Button variant="contained" color="secondary" onClick={logout}>
           Logout
         </Button>
       </Grid>
 
       <Grid container direction="row">
         <Grid item lg={2}>
-          <Typography variant="h4">Filter By</Typography>
+          <Typography variant="h5">Filter By</Typography>
         </Grid>
         <Grid item lg={10}>
           <Grid container>
             <Grid item lg={10}>
-              <Typography variant="h4">
+              <Typography variant="h5">
                 User List
                 <Button color="primary">
-                  <CachedIcon onClick={() => window.location.reload()} />
+                  <CachedIcon onClick={() => getUserByHireDate(startDate)} />
                 </Button>
               </Typography>
             </Grid>
@@ -200,9 +213,11 @@ function List() {
             <DatePicker
               label="Start Date"
               value={startDate}
-              onChange={(newStartDate) =>
-                setStartDate(moment(newStartDate).format("YYYY-MM-DD"))
-              }
+              onChange={(newStartDate) => {
+                setSelectedUser(null);
+                setStartDate(moment(newStartDate).format("YYYY-MM-DD"));
+                getUserByHireDate(moment(newStartDate).format("YYYY-MM-DD"));
+              }}
               renderInput={(params) => <TextField {...params} />}
             />
           </LocalizationProvider>
@@ -215,69 +230,150 @@ function List() {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  Name
-                  <SortIcon
-                    onClick={() => sortByStatus("displayName", true)}
-                    style={{ cursor: "pointer" }}
-                  />
+                  <Box sx={{ display: "flex", flexDirection: "row" }}>
+                    <Typography variant="subtitle1">Name</Typography>
+                    <SortIcon
+                      onClick={() => sortByStatus("displayName", true)}
+                      style={{ cursor: "pointer", color: "white" }}
+                    />
+                  </Box>
                 </TableCell>
 
-                <TableCell>Work Email (Username)</TableCell>
-                <TableCell>Secondary Email</TableCell>
                 <TableCell>
-                  Status
-                  <SortIcon
-                    onClick={() => sortByStatus("status", false)}
-                    style={{ cursor: "pointer" }}
-                  />
+                  <Typography variant="subtitle1">
+                    Work Email (Username)
+                  </Typography>
                 </TableCell>
-                <TableCell>Person Type</TableCell>
-                <TableCell>Location</TableCell>
-                <TableCell>Start Date</TableCell>
-                <TableCell>Title</TableCell>
                 <TableCell>
-                  Department
-                  <SortIcon
-                    onClick={() => sortByStatus("department", true)}
-                    style={{ cursor: "pointer" }}
-                  />
+                  <Typography variant="subtitle1">Secondary Email</Typography>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", flexDirection: "row" }}>
+                    <Typography variant="subtitle1">Status</Typography>
+                    <SortIcon
+                      onClick={() => sortByStatus("status", false)}
+                      style={{ cursor: "pointer", color: "white" }}
+                    />
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle1">Person Type</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle1">Location</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle1">Start Date</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle1">Title</Typography>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", flexDirection: "row" }}>
+                    <Typography variant="subtitle1">Department</Typography>
+                    <SortIcon
+                      onClick={() => sortByStatus("department", true)}
+                      style={{ cursor: "pointer", color: "white" }}
+                    />
+                  </Box>
                 </TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {data
-                ?.filter((user) => {
-                  // start date filter
-                  if (startDate === null) {
-                    return user;
-                  } else if (user.profile.hireDate.includes(startDate)) {
-                    return user;
+            <TableBody className="tableBody">
+              {data?.map((user, id) => (
+                <TableRow
+                  id={user.id}
+                  style={
+                    selectedUser?.id === user.id
+                      ? { background: "gray" }
+                      : { background: "#f2f2f2" }
                   }
-                  return false;
-                })
-                ?.map((user, id) => (
-                  <TableRow
-                    id={user.id}
-                    style={
+                  key={user.id}
+                  onClick={() => toggleActive(user)}
+                >
+                  <TableCell
+                    className={
                       selectedUser?.id === user.id
-                        ? { background: "gray" }
-                        : { background: "#f2f2f2" }
+                        ? classes.active
+                        : classes.deactive
                     }
-                    key={user.id}
-                    onClick={() => toggleActive(user)}
                   >
-                    <TableCell>{user.profile.displayName}</TableCell>
-                    <TableCell>{user.profile.email}</TableCell>
-
-                    <TableCell>{user.profile.secondEmail}</TableCell>
-                    <TableCell>{user.status}</TableCell>
-                    <TableCell>{user.profile.employmentStatus}</TableCell>
-                    <TableCell>{user.profile.workLocation}</TableCell>
-                    <TableCell>{user.profile.hireDate}</TableCell>
-                    <TableCell>{user.profile.title}</TableCell>
-                    <TableCell>{user.profile.department}</TableCell>
-                  </TableRow>
-                ))}
+                    {user.profile.displayName}
+                  </TableCell>
+                  <TableCell
+                    className={
+                      selectedUser?.id === user.id
+                        ? classes.active
+                        : classes.deactive
+                    }
+                  >
+                    {user.profile.email}
+                  </TableCell>
+                  <TableCell
+                    className={
+                      selectedUser?.id === user.id
+                        ? classes.active
+                        : classes.deactive
+                    }
+                  >
+                    {user.profile.secondEmail}
+                  </TableCell>
+                  <TableCell
+                    className={
+                      selectedUser?.id === user.id
+                        ? classes.active
+                        : classes.deactive
+                    }
+                  >
+                    {user.status}
+                  </TableCell>
+                  <TableCell
+                    className={
+                      selectedUser?.id === user.id
+                        ? classes.active
+                        : classes.deactive
+                    }
+                  >
+                    {user.profile.employmentStatus}
+                  </TableCell>
+                  <TableCell
+                    className={
+                      selectedUser?.id === user.id
+                        ? classes.active
+                        : classes.deactive
+                    }
+                  >
+                    {user.profile.workLocation}
+                  </TableCell>
+                  <TableCell
+                    className={
+                      selectedUser?.id === user.id
+                        ? classes.active
+                        : classes.deactive
+                    }
+                  >
+                    {user.profile.hireDate}
+                  </TableCell>
+                  <TableCell
+                    className={
+                      selectedUser?.id === user.id
+                        ? classes.active
+                        : classes.deactive
+                    }
+                  >
+                    {user.profile.title}
+                  </TableCell>
+                  <TableCell
+                    className={
+                      selectedUser?.id === user.id
+                        ? classes.active
+                        : classes.deactive
+                    }
+                  >
+                    {user.profile.department}
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </Grid>

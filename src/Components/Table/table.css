@@ -22,6 +22,9 @@ table th {
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
-  background-color: #04aa6d;
+  background-color: #1976d2;
+  color: white;
+}
+table h6 {
   color: white;
 }

@@ -29,23 +29,18 @@ const SuccessDialog = (props) => {
   const classes = useStyles();
 
   const handleClose = () => {
+    props.getUserByHireDate(props.startDate);
+    props.setShowStatusModal({ ...props.showStatusModal, isSuccess: false });
     setOpen(false);
   };
 
   return (
     <>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle style={{ border: "2px solid black" }}>
-          <Typography variant="h4">Success</Typography>
-        </DialogTitle>
-
+        <DialogTitle style={{ border: "2px solid black" }}>Success</DialogTitle>
         <DialogContent style={{ border: "2px solid black" }}>
           <DialogContentText className={classes.success}>
-            <Typography variant="h6">
-              {props.user.profile.displayName.split(" ")[0]}'s Account is
-              Activated
-            </Typography>
-
+            {props.user.profile.displayName}'s Account is Activated
             <Button
               onClick={handleClose}
               variant="contained"

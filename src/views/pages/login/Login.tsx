@@ -10,9 +10,7 @@ const Login = ({ config }) => {
     oktaAuth.handleLoginRedirect(tokens);
   };
 
-  const onError = (err) => {
-    console.log("error logging in", err);
-  };
+  const onError = (err) => {};
 
   if (!authState) return null;
 
