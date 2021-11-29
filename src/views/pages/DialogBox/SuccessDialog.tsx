@@ -40,7 +40,7 @@ const SuccessDialog = (props) => {
         <DialogTitle style={{ border: "2px solid black" }}>Success</DialogTitle>
         <DialogContent style={{ border: "2px solid black" }}>
           <DialogContentText className={classes.success}>
-            {props.user.profile.displayName}'s Account is Activated
+            {props.user.profile.displayName.split(" ")[0]}'s Account is Activated
             <Button
               onClick={handleClose}
               variant="contained"

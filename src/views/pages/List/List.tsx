@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../../../Components/Table/table.css";
 import {
-  Alert,
   Box,
   Button,
   Grid,

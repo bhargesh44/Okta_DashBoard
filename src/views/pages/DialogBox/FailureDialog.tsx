@@ -38,7 +38,7 @@ const FailureDialog = (props) => {
         <DialogTitle style={{ border: "2px solid black" }}>Failure</DialogTitle>
         <DialogContent style={{ border: "2px solid black" }}>
           <DialogContentText className={classes.failure}>
-            {props.user.profile.displayName}'s Account is Already Activated
+            {props.user.profile.displayName.split(" ")[0]}'s Account is Already Activated
             <Button
               onClick={handleClose}
               variant="contained"
