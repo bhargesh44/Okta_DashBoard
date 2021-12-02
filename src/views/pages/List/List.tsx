@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import "../../../Components/Table/table.css";
 import { Button, Grid, TextField, Typography } from "@mui/material";
@@ -7,6 +5,8 @@ import CachedIcon from "@mui/icons-material/Cached";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DatePicker from "@mui/lab/DatePicker";
+
+import { authFetch } from "../../../Provider/AuthProvider";
 
 import { useOktaAuth } from "@okta/okta-react";
 
@@ -31,17 +31,16 @@ function List() {
     isSuccess: false,
     isFailure: false,
   });
+
   const token = process.env.REACT_APP_OKTA_TOKEN;
 
   const getUserByHireDate = (hireDate) => {
-    fetch(
+    const dateRequestOptions = {
+      method: "GET",
+    };
+    authFetch(
       `${process.env.REACT_APP_BASE_URL}/api/v1/users/?search=profile.hireDate Eq "${hireDate}"`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `SSWS ${token}`,
-        },
-      }
+      dateRequestOptions
     )
       .then((res) => res.json())
       .then((jsonData) => setData(jsonData));
@@ -97,8 +96,6 @@ function List() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const onSelectionChanged = (user) => {
-    //alert(user.api.getSelectedRows()[0].id);
-
     const selectedRows = user.api.getSelectedRows()[0];
     console.log("selected Row ", selectedRows);
 
@@ -106,16 +103,12 @@ function List() {
   };
 
   const activeAccount = () => {
-    fetch(
+    const activeRequestOptions = {
+      method: "POST",
+    };
+    authFetch(
       `${process.env.REACT_APP_BASE_URL}/api/v1/users/${selectedUser.id}/lifecycle/activate?sendEmail=true`,
-      {
-        method: "POST",
-        headers: {
-          ContentType: "application/json",
-          Accept: "application/json",
-          Authorization: `SSWS ${token}`,
-        },
-      }
+      activeRequestOptions
     )
       .then((res) => {
         if (res.ok) {
@@ -173,23 +166,30 @@ function List() {
         </Button>
       </Grid>
 
-      <Grid container direction="row">
-        <Grid item lg={2}>
-          <Typography variant="h5">Filter By</Typography>
+      <Grid container direction="row" spacing={2}>
+        <Grid item lg={2} md={2} sm={2} xs={2}>
+          <Typography variant="h6">Filter By</Typography>
         </Grid>
-        <Grid item lg={10}>
+        <Grid item lg={10} md={10} sm={10} xs={10}>
           <Grid container>
-            <Grid item lg={10}>
-              <Typography variant="h5">
+            <Grid item lg={10} md={8} sm={8} xs={8}>
+              <Typography variant="h6">
                 User List
                 <Button color="primary">
                   <CachedIcon onClick={() => getUserByHireDate(startDate)} />
                 </Button>
               </Typography>
             </Grid>
-            <Grid item lg={2} display="flex" justifyContent="end">
+            <Grid
+              item
+              lg={2}
+              md={4}
+              sm={4}
+              xs={4}
+              display="flex"
+              justifyContent="end"
+            >
               <Button
-                id="btn"
                 style={{ marginBottom: "5px" }}
                 variant="contained"
                 onClick={changeAccountStatus}
@@ -202,7 +202,7 @@ function List() {
         </Grid>
       </Grid>
 
-      <Grid container direction="row">
+      <Grid container direction="row" spacing={2}>
         <Grid item lg={2} md={2} sm={2} xs={2} mt={1}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
@@ -227,6 +227,7 @@ function List() {
               columnDefs={columns}
               defaultColDef={defaultColDef}
               rowSelection={rowSelectionType}
+              rowMultiSelectWithClick={true}
               onSelectionChanged={onSelectionChanged}
               pagination={true}
               //paginationPageSize={7}
