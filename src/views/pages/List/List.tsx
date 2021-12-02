@@ -1,60 +1,36 @@
+
+
 import React, { useEffect, useState } from "react";
 import "../../../Components/Table/table.css";
-import {
-  Box,
-  Button,
-  Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { makeStyles } from "@material-ui/core";
-import SuccessDialog from "../DialogBox/SuccessDialog";
+import { Button, Grid, TextField, Typography } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
-import FailureDialog from "../DialogBox/FailureDialog";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DatePicker from "@mui/lab/DatePicker";
-import SortIcon from "@mui/icons-material/ImportExport";
+
 import { useOktaAuth } from "@okta/okta-react";
+
+import { AgGridReact } from "ag-grid-react";
 
 import moment from "moment";
 
-const useStyles = makeStyles({
-  active: {
-    color: "white",
-  },
-  deactive: {
-    color: "black",
-  },
-  tableBody: {
-    overflowY: "scroll",
-  },
-});
+import "ag-grid-community/dist/styles/ag-grid.css";
+import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+import SuccessDialog from "../DialogBox/SuccessDialog";
+import FailureDialog from "../DialogBox/FailureDialog";
 
 function List() {
   const { oktaAuth, authState } = useOktaAuth();
-
-  const classes = useStyles();
 
   const [data, setData] = useState<any>([]);
 
   const [startDate, setStartDate] = useState<any>(
     moment(new Date()).format("YYYY-MM-DD")
   );
-
-  const [selectedUser, setSelectedUser] = useState<any>(false);
-
   const [showStatusModal, setShowStatusModal] = useState<any>({
     isSuccess: false,
     isFailure: false,
   });
-
-  const [order, setOrder] = useState("ASC");
   const token = process.env.REACT_APP_OKTA_TOKEN;
 
   const getUserByHireDate = (hireDate) => {
@@ -73,46 +49,60 @@ function List() {
 
   useEffect(() => getUserByHireDate(startDate), []);
 
-  const sortByStatus = (colName, forProfile) => {
-    if (order === "ASC") {
-      if (forProfile) {
-        var sorted = [...data].sort((a, b) =>
-          a["profile"][colName] > b["profile"][colName] ? 1 : -1
-        );
-      } else {
-        var sorted = [...data].sort((a, b) =>
-          a[colName] > b[colName] ? 1 : -1
-        );
-      }
+  const columns = [
+    {
+      headerName: "Name",
+      field: "profile.displayName",
+    },
+    {
+      headerName: "Email",
+      field: "profile.email",
+    },
+    {
+      headerName: "SecondMail",
+      field: "profile.secondEmail",
+    },
+    {
+      headerName: "Status",
+      field: "status",
+    },
+    {
+      headerName: "Person Type",
+      field: "profile.employmentStatus",
+    },
+    {
+      headerName: "Location",
+      field: "profile.workLocation",
+    },
+    {
+      headerName: "Start Date",
+      field: "profile.hireDate",
+    },
+    {
+      headerName: "Title",
+      field: "profile.title",
+    },
+    {
+      headerName: "Department",
+      field: "profile.department",
+    },
+  ];
 
-      setData(sorted);
-      setOrder("DSC");
-    }
-    if (order === "DSC") {
-      if (forProfile) {
-        var sorted = [...data].sort((a, b) =>
-          a["profile"][colName] < b["profile"][colName] ? 1 : -1
-        );
-      } else {
-        var sorted = [...data].sort((a, b) =>
-          a[colName] < b[colName] ? 1 : -1
-        );
-      }
-      setData(sorted);
-      setOrder("ASC");
-    }
+  const defaultColDef = {
+    sortable: true,
+    filter: true,
   };
 
-  if (!authState) return null;
+  const rowSelectionType = "single";
+  const [selectedUser, setSelectedUser] = useState<any>(null);
 
-  const logout = async () => oktaAuth.signOut();
+  const onSelectionChanged = (user) => {
+    //alert(user.api.getSelectedRows()[0].id);
 
-  const toggleActive = (user) => {
-    if (selectedUser?.id === user.id) {
-      setSelectedUser(null);
-    } else {
-      setSelectedUser(user);
-    }
+    const selectedRows = user.api.getSelectedRows()[0];
+    console.log("selected Row ", selectedRows);
+
+    setSelectedUser(selectedRows);
   };
 
   const activeAccount = () => {
@@ -146,6 +136,10 @@ function List() {
     activeAccount();
   };
 
+  if (!authState) return null;
+
+  const logout = async () => oktaAuth.signOut();
+
   return (
     <>
       {selectedUser && showStatusModal.isSuccess && (
@@ -155,6 +149,7 @@ function List() {
           startDate={startDate}
           setShowStatusModal={setShowStatusModal}
           showStatusModal={showStatusModal}
+          setSelectedUser={setSelectedUser}
         />
       )}
       {selectedUser && showStatusModal.isFailure && (
@@ -194,10 +189,11 @@ function List() {
             </Grid>
             <Grid item lg={2} display="flex" justifyContent="end">
               <Button
+                id="btn"
                 style={{ marginBottom: "5px" }}
                 variant="contained"
                 onClick={changeAccountStatus}
-                disabled={!selectedUser}
+                disabled={selectedUser ? false : true}
               >
                 Active Account
               </Button>
@@ -207,174 +203,36 @@ function List() {
       </Grid>
 
       <Grid container direction="row">
-        <Grid item lg={2} mt={1}>
+        <Grid item lg={2} md={2} sm={2} xs={2} mt={1}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label="Start Date"
               value={startDate}
               onChange={(newStartDate) => {
-                setSelectedUser(null);
                 setStartDate(moment(newStartDate).format("YYYY-MM-DD"));
                 getUserByHireDate(moment(newStartDate).format("YYYY-MM-DD"));
               }}
               renderInput={(params) => <TextField {...params} />}
             />
           </LocalizationProvider>
-
-          <br />
-          <br />
         </Grid>
-        <Grid item lg={10}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <Box sx={{ display: "flex", flexDirection: "row" }}>
-                    <Typography variant="subtitle1">Name</Typography>
-                    <SortIcon
-                      onClick={() => sortByStatus("displayName", true)}
-                      style={{ cursor: "pointer", color: "white" }}
-                    />
-                  </Box>
-                </TableCell>
 
-                <TableCell>
-                  <Typography variant="subtitle1">
-                    Work Email (Username)
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1">Secondary Email</Typography>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", flexDirection: "row" }}>
-                    <Typography variant="subtitle1">Status</Typography>
-                    <SortIcon
-                      onClick={() => sortByStatus("status", false)}
-                      style={{ cursor: "pointer", color: "white" }}
-                    />
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1">Person Type</Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1">Location</Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1">Start Date</Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1">Title</Typography>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", flexDirection: "row" }}>
-                    <Typography variant="subtitle1">Department</Typography>
-                    <SortIcon
-                      onClick={() => sortByStatus("department", true)}
-                      style={{ cursor: "pointer", color: "white" }}
-                    />
-                  </Box>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody className="tableBody">
-              {data?.map((user, id) => (
-                <TableRow
-                  id={user.id}
-                  style={
-                    selectedUser?.id === user.id
-                      ? { background: "gray" }
-                      : { background: "#f2f2f2" }
-                  }
-                  key={user.id}
-                  onClick={() => toggleActive(user)}
-                >
-                  <TableCell
-                    className={
-                      selectedUser?.id === user.id
-                        ? classes.active
-                        : classes.deactive
-                    }
-                  >
-                    {user.profile.displayName}
-                  </TableCell>
-                  <TableCell
-                    className={
-                      selectedUser?.id === user.id
-                        ? classes.active
-                        : classes.deactive
-                    }
-                  >
-                    {user.profile.email}
-                  </TableCell>
-                  <TableCell
-                    className={
-                      selectedUser?.id === user.id
-                        ? classes.active
-                        : classes.deactive
-                    }
-                  >
-                    {user.profile.secondEmail}
-                  </TableCell>
-                  <TableCell
-                    className={
-                      selectedUser?.id === user.id
-                        ? classes.active
-                        : classes.deactive
-                    }
-                  >
-                    {user.status}
-                  </TableCell>
-                  <TableCell
-                    className={
-                      selectedUser?.id === user.id
-                        ? classes.active
-                        : classes.deactive
-                    }
-                  >
-                    {user.profile.employmentStatus}
-                  </TableCell>
-                  <TableCell
-                    className={
-                      selectedUser?.id === user.id
-                        ? classes.active
-                        : classes.deactive
-                    }
-                  >
-                    {user.profile.workLocation}
-                  </TableCell>
-                  <TableCell
-                    className={
-                      selectedUser?.id === user.id
-                        ? classes.active
-                        : classes.deactive
-                    }
-                  >
-                    {user.profile.hireDate}
-                  </TableCell>
-                  <TableCell
-                    className={
-                      selectedUser?.id === user.id
-                        ? classes.active
-                        : classes.deactive
-                    }
-                  >
-                    {user.profile.title}
-                  </TableCell>
-                  <TableCell
-                    className={
-                      selectedUser?.id === user.id
-                        ? classes.active
-                        : classes.deactive
-                    }
-                  >
-                    {user.profile.department}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <Grid item lg={10} md={10} sm={10} xs={10}>
+          <div
+            className="ag-theme-alpine"
+            style={{ height: 425, width: "100%" }}
+          >
+            <AgGridReact
+              rowData={data}
+              columnDefs={columns}
+              defaultColDef={defaultColDef}
+              rowSelection={rowSelectionType}
+              onSelectionChanged={onSelectionChanged}
+              pagination={true}
+              //paginationPageSize={7}
+              paginationAutoPageSize={true}
+            />
+          </div>
         </Grid>
       </Grid>
     </>
