@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
+
 import "../../../Components/Table/table.css";
+
 import { Button, Grid, TextField, Typography } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
+
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DatePicker from "@mui/lab/DatePicker";
@@ -16,6 +19,7 @@ import moment from "moment";
 
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+
 import SuccessDialog from "../DialogBox/SuccessDialog";
 import FailureDialog from "../DialogBox/FailureDialog";
 
@@ -32,12 +36,11 @@ function List() {
     isFailure: false,
   });
 
-  const token = process.env.REACT_APP_OKTA_TOKEN;
-
   const getUserByHireDate = (hireDate) => {
     const dateRequestOptions = {
       method: "GET",
     };
+
     authFetch(
       `${process.env.REACT_APP_BASE_URL}/api/v1/users/?search=profile.hireDate Eq "${hireDate}"`,
       dateRequestOptions
@@ -97,7 +100,6 @@ function List() {
 
   const onSelectionChanged = (user) => {
     const selectedRows = user.api.getSelectedRows()[0];
-    console.log("selected Row ", selectedRows);
 
     setSelectedUser(selectedRows);
   };
@@ -106,6 +108,7 @@ function List() {
     const activeRequestOptions = {
       method: "POST",
     };
+
     authFetch(
       `${process.env.REACT_APP_BASE_URL}/api/v1/users/${selectedUser.id}/lifecycle/activate?sendEmail=true`,
       activeRequestOptions
@@ -230,7 +233,6 @@ function List() {
               rowMultiSelectWithClick={true}
               onSelectionChanged={onSelectionChanged}
               pagination={true}
-              //paginationPageSize={7}
               paginationAutoPageSize={true}
             />
           </div>
