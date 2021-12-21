@@ -5,19 +5,25 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-} from "@mui/material";
+} from "@material-ui/core";
 
 import { makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles({
-  failure: {
+  failureBoxTitle: {
+    border: "2px solid black",
+  },
+  failureBoxContent: {
+    border: "2px solid black",
+  },
+  failureBoxContentText: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "column",
     margin: "100px",
   },
-  failureButton: {
+  failureBoxButton: {
     marginTop: "25px",
   },
 });
@@ -34,16 +40,16 @@ const FailureDialog = (props) => {
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle style={{ border: "2px solid black" }}>Failure</DialogTitle>
-        <DialogContent style={{ border: "2px solid black" }}>
-          <DialogContentText className={classes.failure}>
+        <DialogTitle className={classes.failureBoxTitle}>Failure</DialogTitle>
+        <DialogContent className={classes.failureBoxContent}>
+          <DialogContentText className={classes.failureBoxContentText}>
             {props.user.profile.displayName.split(" ")[0]}'s Account is Already
             Activated
             <Button
               onClick={handleClose}
               variant="contained"
               color="primary"
-              className={classes.failureButton}
+              className={classes.failureBoxButton}
             >
               Close
             </Button>

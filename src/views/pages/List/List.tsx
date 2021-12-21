@@ -1,29 +1,48 @@
 import React, { useEffect, useState } from "react";
 
-import "../../../Components/Table/table.css";
+import { Button, Grid, Typography } from "@material-ui/core";
+import { Cached } from "@material-ui/icons";
 
-import { Button, Grid, TextField, Typography } from "@mui/material";
-import CachedIcon from "@mui/icons-material/Cached";
-
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import DatePicker from "@mui/lab/DatePicker";
+import moment from "moment";
+import MomentUtils from "@date-io/moment";
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider,
+} from "@material-ui/pickers";
 
 import { authFetch } from "../../../Provider/AuthProvider";
 
 import { useOktaAuth } from "@okta/okta-react";
 
 import { AgGridReact } from "ag-grid-react";
-
-import moment from "moment";
-
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 
 import SuccessDialog from "../DialogBox/SuccessDialog";
 import FailureDialog from "../DialogBox/FailureDialog";
 
+import { makeStyles } from "@material-ui/core";
+
+const useStyles = makeStyles({
+  logout_btn_grid: {
+    display: "flex",
+    justifyContent: "flex-end",
+    marginTop: "10px",
+    marginBottom: "10px",
+  },
+  active_btn_grid: {
+    display: "flex",
+    justifyContent: "flex-end",
+  },
+  filter_grid: {
+    display: "flex",
+    marginTop: "1px",
+  },
+});
+
 function List() {
+  const classes = useStyles();
+
   const { oktaAuth, authState } = useOktaAuth();
 
   const [data, setData] = useState<any>([]);
@@ -49,7 +68,7 @@ function List() {
       .then((jsonData) => setData(jsonData));
   };
 
-  useEffect(() => getUserByHireDate(startDate), []);
+  useEffect(() => getUserByHireDate(startDate), [startDate]);
 
   const columns = [
     {
@@ -155,21 +174,13 @@ function List() {
           showStatusModal={showStatusModal}
         />
       )}
-      <Grid
-        container
-        spacing={2}
-        direction="row"
-        mt={4}
-        display="flex"
-        justifyContent="end"
-        mb={2}
-      >
+      <Grid container direction="row" className={classes.logout_btn_grid}>
         <Button variant="contained" color="secondary" onClick={logout}>
           Logout
         </Button>
       </Grid>
 
-      <Grid container direction="row" spacing={2}>
+      <Grid container direction="row" spacing={1}>
         <Grid item lg={2} md={2} sm={2} xs={2}>
           <Typography variant="h6">Filter By</Typography>
         </Grid>
@@ -179,7 +190,7 @@ function List() {
               <Typography variant="h6">
                 User List
                 <Button color="primary">
-                  <CachedIcon onClick={() => getUserByHireDate(startDate)} />
+                  <Cached onClick={() => getUserByHireDate(startDate)} />
                 </Button>
               </Typography>
             </Grid>
@@ -189,8 +200,7 @@ function List() {
               md={4}
               sm={4}
               xs={4}
-              display="flex"
-              justifyContent="end"
+              className={classes.active_btn_grid}
             >
               <Button
                 style={{ marginBottom: "5px" }}
@@ -206,18 +216,28 @@ function List() {
       </Grid>
 
       <Grid container direction="row" spacing={2}>
-        <Grid item lg={2} md={2} sm={2} xs={2} mt={1}>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DatePicker
+        <Grid item lg={2} md={2} sm={2} xs={2} className={classes.filter_grid}>
+          <MuiPickersUtilsProvider utils={MomentUtils}>
+            <KeyboardDatePicker
+              autoOk
+              variant="inline"
+              inputVariant="outlined"
+              margin="normal"
+              id="date-picker-dialog"
+              format="DD-MM-YYYY"
               label="Start Date"
+              InputAdornmentProps={{ position: "end" }}
+              KeyboardButtonProps={{
+                "aria-label": "change date",
+              }}
               value={startDate}
               onChange={(newStartDate) => {
+                setSelectedUser(null);
                 setStartDate(moment(newStartDate).format("YYYY-MM-DD"));
                 getUserByHireDate(moment(newStartDate).format("YYYY-MM-DD"));
               }}
-              renderInput={(params) => <TextField {...params} />}
             />
-          </LocalizationProvider>
+          </MuiPickersUtilsProvider>
         </Grid>
 
         <Grid item lg={10} md={10} sm={10} xs={10}>

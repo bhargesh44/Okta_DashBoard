@@ -1,5 +1,4 @@
 import { Route, Switch, useHistory } from "react-router-dom";
-import { StyledEngineProvider } from "@mui/material";
 import "./App.css";
 import Login from "./views/pages/login/Login";
 
@@ -42,22 +41,20 @@ const App = () => {
 
   return (
     <>
-      <StyledEngineProvider injectFirst>
-        <Security
-          oktaAuth={oktaAuth}
-          restoreOriginalUri={restoreOriginalUri}
-          onAuthRequired={onAuthRequired}
-        >
-          <Switch>
-            <Route
-              path="/login"
-              render={() => <Login config={oktaSignInConfig} />}
-            />
-            <SecureRoute path="/" exact={true} component={Lists} />
-            <Route path="/login/callback" component={LoginCallback} />
-          </Switch>
-        </Security>
-      </StyledEngineProvider>
+      <Security
+        oktaAuth={oktaAuth}
+        restoreOriginalUri={restoreOriginalUri}
+        onAuthRequired={onAuthRequired}
+      >
+        <Switch>
+          <Route
+            path="/login"
+            render={() => <Login config={oktaSignInConfig} />}
+          />
+          <SecureRoute path="/" exact={true} component={Lists} />
+          <Route path="/login/callback" component={LoginCallback} />
+        </Switch>
+      </Security>
     </>
   );
 };
